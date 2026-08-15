@@ -97,6 +97,9 @@ func (j *Journal) Flush(path string) (err error) {
 	}
 	w := bufio.NewWriter(f)
 	defer func() {
+		if flushErr := w.Flush(); err == nil && flushErr != nil {
+			err = fmt.Errorf("store: 刷新流水文件 %s 失败: %w", path, flushErr)
+		}
 		if closeErr := f.Close(); err == nil && closeErr != nil {
 			err = fmt.Errorf("store: 关闭流水文件 %s 失败: %w", path, closeErr)
 		}
